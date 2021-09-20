@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="titles">
+        <item>How dare you?</item>
+        <item>WTF, moit?</item>
+    </string-array>
+
+    <string-array name="note_bodies">
+        <item>Lessss gooooooooooo</item>
+        <item>Well, there is some things in my life</item>
+    </string-array>
+
+    <integer-array name="days">
+        <item>0</item>
+        <item>0</item>
+    </integer-array>
+
+    <integer-array name="months">
+        <item>0</item>
+        <item>0</item>
+    </integer-array>
+
+    <integer-array name="years">
+        <item>0</item>
+        <item>0</item>
+    </integer-array>
+</resources>
