@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/new_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/note_add_text" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/notes"
         android:name="com.garvardinho.mynotes.NotesFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-</FrameLayout>
+        android:layout_height="match_parent" />
+</LinearLayout>

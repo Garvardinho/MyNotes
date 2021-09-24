@@ -2,9 +2,13 @@ package com.garvardinho.mynotes
 
 import android.os.Parcel
 import android.os.Parcelable
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
-class Note() : Parcelable {
+open class Note() : RealmObject(), Parcelable {
+    @PrimaryKey
     var title: String? = null
+
     var noteBody: String? = null
     var year: Int = 0
     var month: Int = 0
