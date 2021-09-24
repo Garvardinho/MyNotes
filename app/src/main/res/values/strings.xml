@@ -4,4 +4,5 @@
     <string name="note_add_text">Create a new one</string>
     <string name="title">Title</string>
     <string name="create_new_note">Create new note</string>
+    <string name="save">Save</string>
 </resources>
