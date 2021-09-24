@@ -9,14 +9,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
+import com.google.android.material.button.MaterialButton
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import io.realm.RealmResults
+import io.realm.kotlin.where
 
 class NotesFragment : Fragment() {
 
     private var isLandscape: Boolean = false
     private var currentNote: Note? = null
+    private lateinit var backgroundThreadRealm: Realm
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        backgroundThreadRealm = RealmInstance.getInstance(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,12 +43,8 @@ class NotesFragment : Fragment() {
         currentNote = if (savedInstanceState != null) {
             savedInstanceState.getParcelable(getString(R.string.current_note))
         } else {
-            Note(
-                resources.getStringArray(R.array.titles)[0],
-                resources.getStringArray(R.array.note_bodies)[0],
-                resources.getIntArray(R.array.years)[0],
-                resources.getIntArray(R.array.months)[0],
-                resources.getIntArray(R.array.days)[0])
+            if (backgroundThreadRealm.where<Note>().count() == 0L) null
+            else backgroundThreadRealm.where<Note>().findFirst()
         }
 
         isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -44,7 +52,18 @@ class NotesFragment : Fragment() {
             showNotesBody(currentNote)
         }
 
-        initList(view)
+        val createNewNoteButton: MaterialButton =
+            (context as AppCompatActivity).findViewById(R.id.new_note)
+        createNewNoteButton.setOnClickListener {
+            startActivity(Intent(context, CreateNewNoteActivity::class.java))
+        }
+
+        //initList(view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initList(requireView())
     }
 
     private fun showNotesBody(note: Note?) {
@@ -55,7 +74,8 @@ class NotesFragment : Fragment() {
     }
 
     private fun showLandNotesBody(note: Note?) {
-        val detail: NotesBodyFragment = NotesBodyFragment.newInstance(getString(R.string.current_note), note)
+        val detail: NotesBodyFragment =
+            NotesBodyFragment.newInstance(getString(R.string.current_note), note)
         val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
 
@@ -66,23 +86,17 @@ class NotesFragment : Fragment() {
     }
 
     private fun initList(view: View) {
-        val layoutView: LinearLayout = view as LinearLayout
-        val noteTitles: Array<String> = resources.getStringArray(R.array.titles)
+        val layout = view as LinearLayout
+        val noteList: RealmResults<Note> = backgroundThreadRealm.where<Note>().findAll()
 
-        for (i in noteTitles.indices) {
-            val noteTitle: String = noteTitles[i]
-            val textView = TextView(context)
-            textView.text = noteTitle
+        layout.removeAllViews()
+        for (note in noteList) {
+            val textView = TextView(requireContext())
+            textView.text = note.title
             textView.textSize = 30.toFloat()
-            layoutView.addView(textView)
+            layout.addView(textView)
             textView.setOnClickListener {
-                currentNote = Note(
-                    resources.getStringArray(R.array.titles)[i],
-                    resources.getStringArray(R.array.note_bodies)[i],
-                    resources.getIntArray(R.array.years)[i],
-                    resources.getIntArray(R.array.months)[i],
-                    resources.getIntArray(R.array.days)[i])
-                showNotesBody(currentNote)
+                showNotesBody(note)
             }
         }
     }
@@ -96,5 +110,10 @@ class NotesFragment : Fragment() {
         val intent = Intent(activity, NotesBodyActivity::class.java)
         intent.putExtra(getString(R.string.current_note), note)
         startActivity(intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        backgroundThreadRealm.close()
     }
 }
