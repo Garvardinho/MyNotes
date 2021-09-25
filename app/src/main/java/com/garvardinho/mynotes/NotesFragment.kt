@@ -15,7 +15,6 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import com.google.android.material.button.MaterialButton
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import io.realm.RealmResults
 import io.realm.kotlin.where
 
@@ -27,7 +26,7 @@ class NotesFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        backgroundThreadRealm = RealmInstance.getInstance(requireContext())
+        backgroundThreadRealm = MainActivity.getRealmInstance()
     }
 
     override fun onCreateView(
@@ -57,8 +56,6 @@ class NotesFragment : Fragment() {
         createNewNoteButton.setOnClickListener {
             startActivity(Intent(context, CreateNewNoteActivity::class.java))
         }
-
-        //initList(view)
     }
 
     override fun onResume() {
@@ -110,10 +107,5 @@ class NotesFragment : Fragment() {
         val intent = Intent(activity, NotesBodyActivity::class.java)
         intent.putExtra(getString(R.string.current_note), note)
         startActivity(intent)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        backgroundThreadRealm.close()
     }
 }

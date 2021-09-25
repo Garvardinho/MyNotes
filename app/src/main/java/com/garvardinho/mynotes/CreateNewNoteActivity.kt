@@ -15,7 +15,7 @@ class CreateNewNoteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_new_note)
 
-        backgroundRealmThread = RealmInstance.getInstance(this)
+        backgroundRealmThread = MainActivity.getRealmInstance()
 
         val createNewNoteButton: MaterialButton = findViewById(R.id.create_new_note_button)
         createNewNoteButton.setOnClickListener {

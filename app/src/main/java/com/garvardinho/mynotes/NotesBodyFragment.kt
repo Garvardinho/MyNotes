@@ -5,14 +5,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import io.realm.Realm
+import io.realm.kotlin.where
 
 class NotesBodyFragment : Fragment() {
 
     private var currentNote: Note? = null
 
     companion object {
-        fun newInstance(tag: String, currentNote: Note?) : NotesBodyFragment {
+        fun newInstance(tag: String, currentNote: Note?): NotesBodyFragment {
             val instance = NotesBodyFragment()
             val args = Bundle()
 
@@ -37,6 +41,19 @@ class NotesBodyFragment : Fragment() {
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_notes_body, container, false)
         val noteBody: TextInputEditText = view.findViewById(R.id.note_body)
+        val saveNoteBodyButton: MaterialButton = view.findViewById(R.id.save_note_body)
+
+        saveNoteBodyButton.setOnClickListener {
+            val backgroundRealmThread: Realm = MainActivity.getRealmInstance()
+            backgroundRealmThread.executeTransaction {
+                val currentNoteInDatabase =
+                    backgroundRealmThread.where<Note>().equalTo("title", currentNote?.title)
+                        .findFirst()!!
+                currentNoteInDatabase.noteBody = noteBody.text.toString()
+                currentNote?.noteBody = noteBody.text.toString()
+                Toast.makeText(requireContext(), "Saved!", Toast.LENGTH_LONG).show()
+            }
+        }
 
         noteBody.setText(currentNote?.noteBody ?: "")
         return view
