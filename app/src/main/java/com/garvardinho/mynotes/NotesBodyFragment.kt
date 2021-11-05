@@ -1,11 +1,11 @@
 package com.garvardinho.mynotes
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import io.realm.Realm
@@ -43,6 +43,15 @@ class NotesBodyFragment : Fragment() {
         val noteBody: TextInputEditText = view.findViewById(R.id.note_body)
         val saveNoteBodyButton: MaterialButton = view.findViewById(R.id.save_note_body)
 
+        if (container?.id == R.id.notes &&
+            resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            requireActivity().supportFragmentManager.popBackStack()
+        }
+
+        if (arguments != null) {
+            currentNote = (arguments as Bundle).getParcelable(getString(R.string.current_note))
+        }
+
         saveNoteBodyButton.setOnClickListener {
             val backgroundRealmThread: Realm = MainActivity.getRealmInstance()
             backgroundRealmThread.executeTransaction {
@@ -51,7 +60,7 @@ class NotesBodyFragment : Fragment() {
                         .findFirst()!!
                 currentNoteInDatabase.noteBody = noteBody.text.toString()
                 currentNote?.noteBody = noteBody.text.toString()
-                Toast.makeText(requireContext(), "Saved!", Toast.LENGTH_LONG).show()
+                requireActivity().supportFragmentManager.popBackStack()
             }
         }
 

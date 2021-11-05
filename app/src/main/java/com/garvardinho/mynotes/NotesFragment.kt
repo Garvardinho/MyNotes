@@ -1,6 +1,5 @@
 package com.garvardinho.mynotes
 
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,9 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import com.google.android.material.button.MaterialButton
 import io.realm.Realm
@@ -22,6 +18,7 @@ class NotesFragment : Fragment() {
 
     private var isLandscape: Boolean = false
     private var currentNote: Note? = null
+    private lateinit var noteTitles: LinearLayout
     private lateinit var backgroundThreadRealm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +36,7 @@ class NotesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        noteTitles = view.findViewById(R.id.note_titles)
         currentNote = if (savedInstanceState != null) {
             savedInstanceState.getParcelable(getString(R.string.current_note))
         } else {
@@ -51,16 +49,20 @@ class NotesFragment : Fragment() {
             showNotesBody(currentNote)
         }
 
-        val createNewNoteButton: MaterialButton =
-            (context as AppCompatActivity).findViewById(R.id.new_note)
+        val createNewNoteButton: MaterialButton = requireActivity().findViewById(R.id.new_note)
         createNewNoteButton.setOnClickListener {
-            startActivity(Intent(context, CreateNewNoteActivity::class.java))
+            requireActivity().supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.notes, CreateNewNoteFragment())
+                .setTransition(TRANSIT_FRAGMENT_FADE)
+                .addToBackStack(null)
+                .commit()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        initList(requireView())
+        initList()
     }
 
     private fun showNotesBody(note: Note?) {
@@ -70,29 +72,17 @@ class NotesFragment : Fragment() {
         }
     }
 
-    private fun showLandNotesBody(note: Note?) {
-        val detail: NotesBodyFragment =
-            NotesBodyFragment.newInstance(getString(R.string.current_note), note)
-        val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-
-        fragmentTransaction
-            .replace(R.id.note_body, detail)
-            .setTransition(TRANSIT_FRAGMENT_FADE)
-            .commit()
-    }
-
-    private fun initList(view: View) {
-        val layout = view as LinearLayout
+    private fun initList() {
         val noteList: RealmResults<Note> = backgroundThreadRealm.where<Note>().findAll()
 
-        layout.removeAllViews()
+        noteTitles.removeAllViews()
         for (note in noteList) {
             val textView = TextView(requireContext())
             textView.text = note.title
             textView.textSize = 30.toFloat()
-            layout.addView(textView)
+            noteTitles.addView(textView)
             textView.setOnClickListener {
+                currentNote = note
                 showNotesBody(note)
             }
         }
@@ -103,9 +93,27 @@ class NotesFragment : Fragment() {
         super.onSaveInstanceState(outState)
     }
 
+    private fun showLandNotesBody(note: Note?) {
+        val detail: NotesBodyFragment =
+            NotesBodyFragment.newInstance(getString(R.string.current_note), note)
+
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.note_body, detail)
+            .setTransition(TRANSIT_FRAGMENT_FADE)
+            .addToBackStack(null)
+            .commit()
+    }
+
     private fun showPortNotesBody(note: Note?) {
-        val intent = Intent(activity, NotesBodyActivity::class.java)
-        intent.putExtra(getString(R.string.current_note), note)
-        startActivity(intent)
+        val detail: NotesBodyFragment =
+            NotesBodyFragment.newInstance(getString(R.string.current_note), note)
+
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.notes, detail)
+            .setTransition(TRANSIT_FRAGMENT_FADE)
+            .addToBackStack(null)
+            .commit()
     }
 }

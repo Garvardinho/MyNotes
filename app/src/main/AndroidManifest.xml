@@ -10,10 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.NoActionBar">
         <activity
-            android:name=".CreateNewNoteActivity"
-            android:exported="true" />
-        <activity android:name=".NotesBodyActivity" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
