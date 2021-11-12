@@ -1,12 +1,9 @@
 package com.garvardinho.mynotes
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.DatePicker
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import io.realm.Realm
@@ -25,36 +22,66 @@ class CreateNewNoteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_create_new_note, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val createNewNoteButton: MaterialButton =
-            view.findViewById(R.id.create_new_note_button)
-        val noteTitleTextInputLayout: TextInputLayout = requireActivity().findViewById(R.id.note_title_input_layout)
+        val noteTitleTextInputLayout: TextInputLayout =
+            requireActivity().findViewById(R.id.note_title_input_layout)
         val noteTitleTextInput: TextInputEditText = requireActivity().findViewById(R.id.note_title)
         noteTitleTextInput.setOnClickListener {
             noteTitleTextInputLayout.error = null
         }
 
-        createNewNoteButton.setOnClickListener {
-            val note: Note = createNewNote()
+        super.onViewCreated(view, savedInstanceState)
+    }
 
-            if (noteTitleTextInput.text.isNullOrEmpty()) {
-                noteTitleTextInputLayout.error = "Введите название заметки"
-                return@setOnClickListener
-            }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        val menuAdd: MenuItem = menu.findItem(R.id.menu_add)
+        val menuSave: MenuItem = menu.findItem(R.id.menu_save)
 
-            try {
-                backgroundRealmThread.executeTransaction { transactionRealm ->
-                    transactionRealm.insert(note)
+        menuAdd.isVisible = false
+        menuSave.isVisible = true
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_save -> {
+                if (!titleIsNull()) {
+                    val note: Note = createNewNote()
+                    try {
+                        createNoteInRealm(note)
+                    } catch (e: RealmPrimaryKeyConstraintException) {
+                        val noteTitleTextInputLayout: TextInputLayout =
+                            requireActivity().findViewById(R.id.note_title_input_layout)
+                        noteTitleTextInputLayout.error = "Такое название уже имеется"
+                    }
                 }
-                requireActivity().supportFragmentManager.popBackStack()
-            } catch (e: RealmPrimaryKeyConstraintException) {
-                noteTitleTextInputLayout.error = "Такое название уже имеется"
             }
         }
-        super.onViewCreated(view, savedInstanceState)
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun titleIsNull(): Boolean {
+        val noteTitleTextInputLayout: TextInputLayout =
+            requireActivity().findViewById(R.id.note_title_input_layout)
+        val noteTitleTextInput: TextInputEditText = requireActivity().findViewById(R.id.note_title)
+
+        if (noteTitleTextInput.text.isNullOrEmpty()) {
+            noteTitleTextInputLayout.error = "Введите название заметки"
+            return true
+        }
+
+        return false
+    }
+
+    private fun createNoteInRealm(note: Note) {
+        backgroundRealmThread.executeTransaction { transactionRealm ->
+            transactionRealm.insert(note)
+        }
+        requireActivity().supportFragmentManager.popBackStack()
     }
 
     private fun createNewNote(): Note {
@@ -65,6 +92,6 @@ class CreateNewNoteFragment : Fragment() {
         val noteMonth: Int = noteDatePicker.month
         val noteDay: Int = noteDatePicker.dayOfMonth
 
-        return Note(noteTitle,null, noteYear, noteMonth, noteDay)
+        return Note(noteTitle, null, noteYear, noteMonth, noteDay)
     }
 }
