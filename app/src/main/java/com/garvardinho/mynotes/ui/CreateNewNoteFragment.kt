@@ -1,9 +1,12 @@
-package com.garvardinho.mynotes
+package com.garvardinho.mynotes.ui
 
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.DatePicker
+import com.garvardinho.mynotes.MainActivity
+import com.garvardinho.mynotes.Note
+import com.garvardinho.mynotes.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import io.realm.Realm
