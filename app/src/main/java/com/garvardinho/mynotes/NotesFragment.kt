@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
-import com.google.android.material.button.MaterialButton
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.kotlin.where
@@ -47,16 +46,6 @@ class NotesFragment : Fragment() {
         isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (isLandscape) {
             showNotesBody(currentNote)
-        }
-
-        val createNewNoteButton: MaterialButton = requireActivity().findViewById(R.id.new_note)
-        createNewNoteButton.setOnClickListener {
-            requireActivity().supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.notes, CreateNewNoteFragment())
-                .setTransition(TRANSIT_FRAGMENT_FADE)
-                .addToBackStack(null)
-                .commit()
         }
     }
 
