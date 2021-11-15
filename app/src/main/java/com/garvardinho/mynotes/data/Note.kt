@@ -1,4 +1,4 @@
-package com.garvardinho.mynotes
+package com.garvardinho.mynotes.data
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -7,7 +7,7 @@ import io.realm.annotations.PrimaryKey
 
 open class Note() : RealmObject(), Parcelable {
     @PrimaryKey
-    var title: String? = null
+    lateinit var title: String
 
     var noteBody: String? = null
     var year: Int = 0
@@ -15,7 +15,7 @@ open class Note() : RealmObject(), Parcelable {
     var day: Int = 0
 
     constructor(
-        title: String?,
+        title: String,
         noteBody: String?,
         year: Int,
         month: Int,
@@ -28,7 +28,7 @@ open class Note() : RealmObject(), Parcelable {
     }
 
     constructor(parcel: Parcel) : this() {
-        this.title = parcel.readString()
+        this.title = parcel.readString()!!
         this.noteBody = parcel.readString()
         this.year = parcel.readInt()
         this.month = parcel.readInt()

@@ -1,9 +1,12 @@
-package com.garvardinho.mynotes
+package com.garvardinho.mynotes.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import com.garvardinho.mynotes.MainActivity
+import com.garvardinho.mynotes.data.Note
+import com.garvardinho.mynotes.R
 import com.google.android.material.textfield.TextInputEditText
 import io.realm.Realm
 import io.realm.kotlin.where

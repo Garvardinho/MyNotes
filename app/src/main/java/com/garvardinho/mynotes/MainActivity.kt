@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
+import com.garvardinho.mynotes.ui.CreateNewNoteFragment
 import com.google.android.material.navigation.NavigationView
 import io.realm.Realm
 import io.realm.RealmConfiguration

@@ -7,7 +7,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/notes"
-        android:name="com.garvardinho.mynotes.NotesFragment"
+        android:name="com.garvardinho.mynotes.ui.NotesFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </FrameLayout>
