@@ -31,8 +31,9 @@ class NoteAdapter(private val notes: CardsSource) : RecyclerView.Adapter<NoteAda
         this.itemClickListener = itemClickListener
     }
 
-    interface OnItemClickListener {
+    interface OnItemClickListener{
         fun onItemClick(v: View, position: Int)
+        fun onLongClick(v: View, position: Int)
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -44,6 +45,13 @@ class NoteAdapter(private val notes: CardsSource) : RecyclerView.Adapter<NoteAda
                 if (itemClickListener != null) {
                     itemClickListener!!.onItemClick(v, bindingAdapterPosition)
                 }
+            }
+
+            itemView.setOnLongClickListener { v ->
+                if (itemClickListener != null) {
+                    itemClickListener!!.onLongClick(v, bindingAdapterPosition)
+                }
+                return@setOnLongClickListener true
             }
         }
 
