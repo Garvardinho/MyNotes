@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import com.garvardinho.mynotes.MainActivity
-import com.garvardinho.mynotes.Note
+import com.garvardinho.mynotes.data.Note
 import com.garvardinho.mynotes.R
 import com.google.android.material.textfield.TextInputEditText
 import io.realm.Realm

@@ -10,8 +10,10 @@ import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.garvardinho.mynotes.MainActivity
-import com.garvardinho.mynotes.Note
+import com.garvardinho.mynotes.data.Note
 import com.garvardinho.mynotes.R
+import com.garvardinho.mynotes.data.CardsSource
+import com.garvardinho.mynotes.data.CardsSourceAdapter
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.kotlin.where
@@ -61,16 +63,16 @@ class NotesFragment : Fragment() {
     }
 
     private fun initList(recyclerView: RecyclerView) {
-        val noteList: RealmResults<Note> = backgroundThreadRealm.where<Note>().findAll()
+        val data: CardsSource = CardsSourceAdapter(backgroundThreadRealm)
         val layoutManager = LinearLayoutManager(context)
-        val adapter = NoteAdapter(noteList)
+        val adapter = NoteAdapter(data)
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
         adapter.setOnItemClickListener( object: NoteAdapter.OnItemClickListener {
             override fun onItemClick(v: View, position: Int) {
-                currentNote = noteList[position]
+                currentNote = data.getCardData(position)
                 showNotesBody(currentNote)
             }
         })
