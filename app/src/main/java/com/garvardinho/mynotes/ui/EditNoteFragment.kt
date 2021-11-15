@@ -2,20 +2,23 @@ package com.garvardinho.mynotes.ui
 
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.DatePicker
-import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.garvardinho.mynotes.MainActivity
-import com.garvardinho.mynotes.data.Note
 import com.garvardinho.mynotes.R
+import com.garvardinho.mynotes.data.Note
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import io.realm.Realm
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
+import io.realm.kotlin.where
 
-class CreateNewNoteFragment : Fragment() {
-
+class EditNoteFragment(private val note: Note) : Fragment() {
     private lateinit var backgroundRealmThread: Realm
+    private lateinit var noteTitleTextInputLayout: TextInputLayout
+    private lateinit var noteTitleTextInput: TextInputEditText
+    private lateinit var datePicker: DatePicker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,13 +34,14 @@ class CreateNewNoteFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val noteTitleTextInputLayout: TextInputLayout =
-            requireActivity().findViewById(R.id.note_title_input_layout)
-        val noteTitleTextInput: TextInputEditText = requireActivity().findViewById(R.id.note_title)
+        noteTitleTextInputLayout = requireActivity().findViewById(R.id.note_title_input_layout)
+        noteTitleTextInput = requireActivity().findViewById(R.id.note_title)
+        datePicker = requireActivity().findViewById(R.id.note_date)
         noteTitleTextInput.setOnClickListener {
             noteTitleTextInputLayout.error = null
         }
-
+        noteTitleTextInput.setText(note.title)
+        datePicker.updateDate(note.year, note.month, note.day)
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -54,12 +58,9 @@ class CreateNewNoteFragment : Fragment() {
         when (item.itemId) {
             R.id.menu_save -> {
                 if (!titleIsNull()) {
-                    val note: Note = createNewNote()
                     try {
-                        createNoteInRealm(note)
+                        updateNoteInRealm(note)
                     } catch (e: RealmPrimaryKeyConstraintException) {
-                        val noteTitleTextInputLayout: TextInputLayout =
-                            requireActivity().findViewById(R.id.note_title_input_layout)
                         noteTitleTextInputLayout.error = "Такое название уже имеется"
                     }
                 }
@@ -69,9 +70,6 @@ class CreateNewNoteFragment : Fragment() {
     }
 
     private fun titleIsNull(): Boolean {
-        val noteTitleTextInputLayout: TextInputLayout =
-            requireActivity().findViewById(R.id.note_title_input_layout)
-        val noteTitleTextInput: TextInputEditText = requireActivity().findViewById(R.id.note_title)
 
         if (noteTitleTextInput.text.isNullOrEmpty()) {
             noteTitleTextInputLayout.error = "Введите название заметки"
@@ -81,27 +79,33 @@ class CreateNewNoteFragment : Fragment() {
         return false
     }
 
-    private fun createNoteInRealm(note: Note) {
+    private fun updateNoteInRealm(note: Note) {
+        val noteInRealm: Note = backgroundRealmThread.where<Note>()
+            .equalTo("title", note.title)
+            .findFirst()!!
+
+        val noteToInsert = createNewNoteBasedOn(note)
+
         backgroundRealmThread.executeTransaction { transactionRealm ->
-            transactionRealm.insert(note)
+            noteInRealm.deleteFromRealm()
+            transactionRealm.insert(noteToInsert)
         }
+
         requireActivity()
             .supportFragmentManager
             .beginTransaction()
-            .replace(R.id.notes, NotesBodyFragment.newInstance(getString(R.string.current_note), note))
+            .replace(R.id.notes, NotesFragment())
             .addToBackStack(null)
-            .setTransition(TRANSIT_FRAGMENT_FADE)
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
             .commit()
     }
 
-    private fun createNewNote(): Note {
-        val noteTitleTextInput: TextInputEditText = requireActivity().findViewById(R.id.note_title)
-        val noteDatePicker: DatePicker = requireActivity().findViewById(R.id.note_date)
+    private fun createNewNoteBasedOn(note: Note): Note {
         val noteTitle: String = noteTitleTextInput.text.toString()
-        val noteYear: Int = noteDatePicker.year
-        val noteMonth: Int = noteDatePicker.month
-        val noteDay: Int = noteDatePicker.dayOfMonth
+        val noteYear: Int = datePicker.year
+        val noteMonth: Int = datePicker.month
+        val noteDay: Int = datePicker.dayOfMonth
 
-        return Note(noteTitle, null, noteYear, noteMonth, noteDay)
+        return Note(noteTitle, note.noteBody, noteYear, noteMonth, noteDay)
     }
 }

@@ -2,10 +2,8 @@ package com.garvardinho.mynotes.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,7 +13,6 @@ import com.garvardinho.mynotes.R
 import com.garvardinho.mynotes.data.CardsSource
 import com.garvardinho.mynotes.data.CardsSourceAdapter
 import io.realm.Realm
-import io.realm.RealmResults
 import io.realm.kotlin.where
 
 class NotesFragment : Fragment() {
@@ -23,10 +20,13 @@ class NotesFragment : Fragment() {
     private var isLandscape: Boolean = false
     private var currentNote: Note? = null
     private lateinit var backgroundThreadRealm: Realm
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var menu: Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         backgroundThreadRealm = MainActivity.getRealmInstance()
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -34,9 +34,15 @@ class NotesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_notes, container, false)
-        val recyclerView: RecyclerView = view.findViewById(R.id.note_titles)
-        initList(recyclerView)
+        recyclerView = view.findViewById(R.id.note_titles)
+        initList()
         return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        this.menu = menu
+        initMenu(true)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,7 +68,7 @@ class NotesFragment : Fragment() {
         }
     }
 
-    private fun initList(recyclerView: RecyclerView) {
+    private fun initList() {
         val data: CardsSource = CardsSourceAdapter(backgroundThreadRealm)
         val layoutManager = LinearLayoutManager(context)
         val adapter = NoteAdapter(data)
@@ -70,12 +76,55 @@ class NotesFragment : Fragment() {
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
-        adapter.setOnItemClickListener( object: NoteAdapter.OnItemClickListener {
+        adapter.setOnItemClickListener(object: NoteAdapter.OnItemClickListener {
             override fun onItemClick(v: View, position: Int) {
                 currentNote = data.getCardData(position)
                 showNotesBody(currentNote)
             }
+
+            override fun onLongClick(v: View, position: Int) {
+                currentNote = data.getCardData(position)
+                initMenu(false)
+            }
         })
+    }
+
+    private fun initMenu(standard: Boolean) {
+        val menuAdd: MenuItem = menu.findItem(R.id.menu_add)
+        val menuEdit: MenuItem = menu.findItem(R.id.menu_edit)
+        val menuDelete: MenuItem = menu.findItem(R.id.menu_delete)
+
+        menuAdd.isVisible = standard
+        menuEdit.isVisible = !standard
+        menuDelete.isVisible = !standard
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_delete -> {
+                val noteToDelete = backgroundThreadRealm
+                    .where<Note>()
+                    .equalTo("title", currentNote?.title)
+                    .findFirst()
+
+                backgroundThreadRealm.executeTransaction {
+                    noteToDelete?.deleteFromRealm()
+                }
+
+                initList()
+                initMenu(true)
+            }
+
+            R.id.menu_edit -> {
+                requireActivity().supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.notes, EditNoteFragment(currentNote!!))
+                    .setTransition(TRANSIT_FRAGMENT_FADE)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

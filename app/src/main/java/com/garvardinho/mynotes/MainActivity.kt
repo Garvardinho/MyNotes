@@ -10,6 +10,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import com.garvardinho.mynotes.ui.CreateNewNoteFragment
+import com.garvardinho.mynotes.ui.EditNoteFragment
 import com.google.android.material.navigation.NavigationView
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -56,17 +57,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigateFragment(id: Int): Boolean {
-        if (id == R.id.menu_add) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.notes, CreateNewNoteFragment())
-                .setTransition(TRANSIT_FRAGMENT_FADE)
-                .addToBackStack(null)
-                .commit()
+        return when (id) {
+            R.id.menu_add -> {
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.notes, CreateNewNoteFragment())
+                    .setTransition(TRANSIT_FRAGMENT_FADE)
+                    .addToBackStack(null)
+                    .commit()
 
-            return true
+                true
+            }
+
+            else -> false
         }
-        return false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -82,9 +86,13 @@ class MainActivity : AppCompatActivity() {
         if (menu != null) {
             val menuAdd: MenuItem = menu.findItem(R.id.menu_add)
             val menuSave: MenuItem = menu.findItem(R.id.menu_save)
+            val menuEdit: MenuItem = menu.findItem(R.id.menu_edit)
+            val menuDelete: MenuItem = menu.findItem(R.id.menu_delete)
 
             menuAdd.isVisible = true
             menuSave.isVisible = false
+            menuEdit.isVisible = false
+            menuDelete.isVisible = false
         }
 
         return super.onCreateOptionsMenu(menu)

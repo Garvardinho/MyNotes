@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.garvardinho.mynotes.MainActivity
 import com.garvardinho.mynotes.data.Note
 import com.garvardinho.mynotes.R
@@ -78,7 +79,14 @@ class NotesBodyFragment : Fragment() {
                     currentNoteInDatabase.noteBody = noteBody.text.toString()
                     currentNote?.noteBody = noteBody.text.toString()
                 }
-                requireActivity().supportFragmentManager.popBackStack()
+
+                requireActivity()
+                    .supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.notes, NotesFragment())
+                    .addToBackStack(null)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .commit()
             }
         }
         return super.onOptionsItemSelected(item)
