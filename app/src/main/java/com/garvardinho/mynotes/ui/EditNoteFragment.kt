@@ -36,6 +36,7 @@ class EditNoteFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val toolbar: androidx.appcompat.widget.Toolbar = requireActivity().findViewById(R.id.toolbar)
         noteTitleTextInputLayout = requireActivity().findViewById(R.id.note_title_input_layout)
         noteTitleTextInput = requireActivity().findViewById(R.id.note_title)
         datePicker = requireActivity().findViewById(R.id.note_date)
@@ -44,6 +45,7 @@ class EditNoteFragment : Fragment() {
         }
         noteTitleTextInput.setText(note.title)
         datePicker.updateDate(note.year, note.month, note.day)
+        toolbar.title = getString(R.string.edit_title)
         super.onViewCreated(view, savedInstanceState)
     }
 

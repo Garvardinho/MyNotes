@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.DatePicker
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import com.garvardinho.mynotes.MainActivity
 import com.garvardinho.mynotes.data.Note
@@ -31,9 +32,12 @@ class CreateNewNoteFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val toolbar: Toolbar = requireActivity().findViewById(R.id.toolbar)
         val noteTitleTextInputLayout: TextInputLayout =
             requireActivity().findViewById(R.id.note_title_input_layout)
         val noteTitleTextInput: TextInputEditText = requireActivity().findViewById(R.id.note_title)
+
+        toolbar.title = getString(R.string.create_note_title)
         noteTitleTextInput.setOnClickListener {
             noteTitleTextInputLayout.error = null
         }

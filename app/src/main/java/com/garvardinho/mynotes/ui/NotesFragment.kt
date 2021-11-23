@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,7 +35,10 @@ class NotesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_notes, container, false)
+        val toolbar: Toolbar = requireActivity().findViewById(R.id.toolbar)
+
         recyclerView = view.findViewById(R.id.note_titles)
+        toolbar.title = ""
         initList()
         return view
     }
