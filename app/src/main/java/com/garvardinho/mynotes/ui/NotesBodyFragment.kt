@@ -58,11 +58,12 @@ class NotesBodyFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val menuAdd: MenuItem = menu.findItem(R.id.menu_add)
-        val menuSave: MenuItem = menu.findItem(R.id.menu_save)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            MenuObject.setMenuItemsVisibility(MenuObject.LandscapeMainTag)
+        } else {
+            MenuObject.setMenuItemsVisibility(MenuObject.NotesBodyFragmentTag)
+        }
 
-        menuAdd.isVisible = false
-        menuSave.isVisible = true
         super.onCreateOptionsMenu(menu, inflater)
     }
 

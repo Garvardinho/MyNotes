@@ -1,6 +1,7 @@
 package com.garvardinho.mynotes.ui
 
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -21,7 +22,6 @@ class NotesFragment : Fragment() {
     private var currentNote: Note? = null
     private lateinit var backgroundThreadRealm: Realm
     private lateinit var recyclerView: RecyclerView
-    private lateinit var menu: Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +40,7 @@ class NotesFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        this.menu = menu
-        initMenu(true)
+        MenuObject.setMenuItemsVisibility(MenuObject.MainTag)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -84,19 +83,10 @@ class NotesFragment : Fragment() {
 
             override fun onLongClick(v: View, position: Int) {
                 currentNote = data.getCardData(position)
-                initMenu(false)
+                v.setBackgroundColor(Color.LTGRAY)
+                MenuObject.setMenuItemsVisibility(MenuObject.LongTappedTag)
             }
         })
-    }
-
-    private fun initMenu(standard: Boolean) {
-        val menuAdd: MenuItem = menu.findItem(R.id.menu_add)
-        val menuEdit: MenuItem = menu.findItem(R.id.menu_edit)
-        val menuDelete: MenuItem = menu.findItem(R.id.menu_delete)
-
-        menuAdd.isVisible = standard
-        menuEdit.isVisible = !standard
-        menuDelete.isVisible = !standard
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -112,13 +102,18 @@ class NotesFragment : Fragment() {
                 }
 
                 initList()
-                initMenu(true)
+                MenuObject.setMenuItemsVisibility(MenuObject.MainTag)
             }
 
             R.id.menu_edit -> {
+                val editNoteFragment = EditNoteFragment()
+                val args = Bundle()
+                args.putParcelable(getString(R.string.current_note), currentNote)
+                editNoteFragment.arguments = args
+
                 requireActivity().supportFragmentManager
                     .beginTransaction()
-                    .replace(R.id.notes, EditNoteFragment(currentNote!!))
+                    .replace(R.id.notes, editNoteFragment)
                     .setTransition(TRANSIT_FRAGMENT_FADE)
                     .addToBackStack(null)
                     .commit()
@@ -138,7 +133,7 @@ class NotesFragment : Fragment() {
 
         requireActivity().supportFragmentManager
             .beginTransaction()
-            .replace(R.id.note_body, detail)
+            .replace(R.id.note_body_fragment, detail)
             .setTransition(TRANSIT_FRAGMENT_FADE)
             .addToBackStack(null)
             .commit()

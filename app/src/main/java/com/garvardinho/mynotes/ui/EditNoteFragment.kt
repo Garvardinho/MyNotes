@@ -14,7 +14,8 @@ import io.realm.Realm
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.where
 
-class EditNoteFragment(private val note: Note) : Fragment() {
+class EditNoteFragment : Fragment() {
+    private lateinit var note: Note
     private lateinit var backgroundRealmThread: Realm
     private lateinit var noteTitleTextInputLayout: TextInputLayout
     private lateinit var noteTitleTextInput: TextInputEditText
@@ -23,6 +24,7 @@ class EditNoteFragment(private val note: Note) : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         backgroundRealmThread = MainActivity.getRealmInstance()
+        note = arguments?.getParcelable(getString(R.string.current_note))!!
     }
 
     override fun onCreateView(
@@ -46,11 +48,7 @@ class EditNoteFragment(private val note: Note) : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val menuAdd: MenuItem = menu.findItem(R.id.menu_add)
-        val menuSave: MenuItem = menu.findItem(R.id.menu_save)
-
-        menuAdd.isVisible = false
-        menuSave.isVisible = true
+        MenuObject.setMenuItemsVisibility(MenuObject.EditNoteFragmentTag)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -70,12 +68,10 @@ class EditNoteFragment(private val note: Note) : Fragment() {
     }
 
     private fun titleIsNull(): Boolean {
-
         if (noteTitleTextInput.text.isNullOrEmpty()) {
             noteTitleTextInputLayout.error = "Введите название заметки"
             return true
         }
-
         return false
     }
 

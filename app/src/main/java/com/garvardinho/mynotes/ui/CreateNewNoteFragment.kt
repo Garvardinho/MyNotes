@@ -42,11 +42,7 @@ class CreateNewNoteFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val menuAdd: MenuItem = menu.findItem(R.id.menu_add)
-        val menuSave: MenuItem = menu.findItem(R.id.menu_save)
-
-        menuAdd.isVisible = false
-        menuSave.isVisible = true
+        MenuObject.setMenuItemsVisibility(MenuObject.CreateNewNoteFragmentTag)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
