@@ -10,7 +10,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import com.garvardinho.mynotes.ui.CreateNewNoteFragment
-import com.garvardinho.mynotes.ui.EditNoteFragment
+import com.garvardinho.mynotes.ui.MenuObject
 import com.google.android.material.navigation.NavigationView
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         )
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
+        toolbar.title = ""
         setSupportActionBar(toolbar)
         initDrawer(toolbar)
     }
@@ -68,7 +69,6 @@ class MainActivity : AppCompatActivity() {
 
                 true
             }
-
             else -> false
         }
     }
@@ -82,19 +82,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.notes_main_menu, menu)
-
         if (menu != null) {
-            val menuAdd: MenuItem = menu.findItem(R.id.menu_add)
-            val menuSave: MenuItem = menu.findItem(R.id.menu_save)
-            val menuEdit: MenuItem = menu.findItem(R.id.menu_edit)
-            val menuDelete: MenuItem = menu.findItem(R.id.menu_delete)
-
-            menuAdd.isVisible = true
-            menuSave.isVisible = false
-            menuEdit.isVisible = false
-            menuDelete.isVisible = false
+            MenuObject.menuAdd = menu.findItem(R.id.menu_add)
+            MenuObject.menuDelete = menu.findItem(R.id.menu_delete)
+            MenuObject.menuEdit = menu.findItem(R.id.menu_edit)
+            MenuObject.menuSave = menu.findItem(R.id.menu_save)
+            MenuObject.setMenuItemsVisibility(MenuObject.MainTag)
         }
-
         return super.onCreateOptionsMenu(menu)
     }
 }
