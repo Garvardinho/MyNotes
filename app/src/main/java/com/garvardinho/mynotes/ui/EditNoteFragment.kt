@@ -45,7 +45,7 @@ class EditNoteFragment : Fragment() {
         }
         noteTitleTextInput.setText(note.title)
         datePicker.updateDate(note.year, note.month, note.day)
-        toolbar.title = getString(R.string.edit_title)
+        toolbar.title = getString(R.string.edit_title, note.title)
         super.onViewCreated(view, savedInstanceState)
     }
 
